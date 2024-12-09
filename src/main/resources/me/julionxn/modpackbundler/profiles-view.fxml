@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.julionxn.modpackbundler.app.ProfilesController">
+    <children>
+        <AnchorPane prefHeight="32.0" prefWidth="600.0" style="-fx-background-color: #ff0000;" />
+        <AnchorPane layoutY="32.0" prefHeight="369.0" prefWidth="150.0" style="-fx-background-color: #ff0000;">
+            <children>
+                <Button layoutX="25.0" layoutY="170.0" mnemonicParsing="false" onAction="#addProfile" prefWidth="100.0" text="Add Profile" />
+                <Button layoutX="25.0" layoutY="205.0" mnemonicParsing="false" onAction="#openProfile" prefWidth="100.0" text="Open Profile" />
+                <Button layoutX="25.0" layoutY="240.0" mnemonicParsing="false" onAction="#editProfile" prefWidth="100.0" text="Edit Profile" />
+                <Button layoutX="25.0" layoutY="275.0" mnemonicParsing="false" onAction="#removeProfile" prefWidth="100.0" text="Remove Profile" />
+            <Button layoutX="25.0" layoutY="310.0" mnemonicParsing="false" onAction="#bundle" prefWidth="100.0" text="BUNDLE" />
+            </children>
+        </AnchorPane>
+        <ScrollPane hbarPolicy="NEVER" layoutX="150.0" layoutY="32.0" prefHeight="368.0" prefWidth="450.0">
+            <content>
+                <AnchorPane fx:id="profilesContainer" minHeight="0.0" minWidth="0.0" prefHeight="368.0" prefWidth="450.0" />
+            </content>
+        </ScrollPane>
+    </children>
+</AnchorPane>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="230.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.julionxn.modpackbundler.app.profile.ProfileDataController">
+    <AnchorPane prefHeight="32.0" prefWidth="300.0" style="-fx-background-color: #ff0000;" />
+    <Label alignment="CENTER" layoutX="14.0" layoutY="55.0" prefWidth="100.0" text="Profile Name" />
+    <TextField fx:id="profileName" layoutX="123.0" layoutY="51.0" prefWidth="150.0" />
+    <Button layoutX="100.0" layoutY="191.0" mnemonicParsing="false" onAction="#done" prefWidth="100.0" text="Done" />
+   <Label alignment="CENTER" layoutX="14.0" layoutY="121.0" prefWidth="100.0" text="Loader Type" />
+   <MenuButton fx:id="loaderType" contentDisplay="CENTER" layoutX="123.0" layoutY="117.0" mnemonicParsing="false" prefWidth="150.0">
+     <items>
+       <MenuItem mnemonicParsing="false" text="Action 1" />
+       <MenuItem mnemonicParsing="false" text="Action 2" />
+     </items>
+   </MenuButton>
+   <TextField fx:id="loaderVersion" layoutX="123.0" layoutY="150.0" prefWidth="150.0" />
+   <Label alignment="CENTER" layoutX="14.0" layoutY="154.0" prefWidth="100.0" text="Loader Version" />
+   <Label alignment="CENTER" layoutX="14.0" layoutY="88.0" prefWidth="100.0" text="MC Version" />
+   <TextField fx:id="version" layoutX="123.0" layoutY="84.0" prefWidth="150.0" />
+
+</AnchorPane>

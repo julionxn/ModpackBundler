@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.julionxn.modpackbundler.app.ProjectsController">
+    <children>
+        <AnchorPane prefHeight="32.0" prefWidth="600.0" style="-fx-background-color: #ff0000;" />
+        <AnchorPane layoutY="32.0" prefHeight="369.0" prefWidth="150.0" style="-fx-background-color: #ff0000;">
+            <children>
+                <Button layoutX="25.0" layoutY="185.0" mnemonicParsing="false" onAction="#addProject" prefWidth="100.0" text="Add Project" />
+                <Button layoutX="25.0" layoutY="220.0" mnemonicParsing="false" onAction="#openProject" prefWidth="100.0" text="Open Project" />
+                <Button layoutX="25.0" layoutY="255.0" mnemonicParsing="false" onAction="#editProject" prefWidth="100.0" text="Edit Project" />
+                <Button layoutX="25.0" layoutY="290.0" mnemonicParsing="false" onAction="#removeProject" prefWidth="100.0" text="Remove Project" />
+            </children>
+        </AnchorPane>
+        <ScrollPane hbarPolicy="NEVER" layoutX="150.0" layoutY="32.0" prefHeight="368.0" prefWidth="450.0">
+            <content>
+                <AnchorPane fx:id="projectsContainer" minHeight="0.0" minWidth="0.0" prefHeight="368.0" prefWidth="450.0" />
+            </content>
+        </ScrollPane>
+    </children>
+</AnchorPane>
