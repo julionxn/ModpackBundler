@@ -39,6 +39,10 @@ public class ProfileDataController extends BaseController {
             selectedLoaderType = profileLoaderType;
             String loaderVersion = profileModified.getLoaderInfo().version();
             this.loaderVersion.setText(loaderVersion);
+            profileModified.getImagePath().ifPresent(path -> {
+                this.profileImagePath.setText(path.toString());
+            });
+            this.description.setText(profileModified.getDescription());
         } else {
             loaderType.setText(LoaderType.VANILLA.name());
             selectedLoaderType = LoaderType.VANILLA;
