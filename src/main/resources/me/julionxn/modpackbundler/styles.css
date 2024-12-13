@@ -1,0 +1,59 @@
+@font-face {
+    font-family: "Montserrat-Reg";
+    src: url("Montserrat-Regular.ttf");
+}
+
+* {
+    -fx-font-family: "Montserrat-Reg";
+}
+
+#title {
+    -fx-font-size: 12px;
+    -fx-text-fill: #ffffff;
+}
+
+#topBtn {
+    -fx-font-size: 8px;
+    -fx-background-color: transparent;
+    -fx-border-color: #d3d6db;
+    -fx-border-width: 1px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 18px 18px;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.close-btn {
+    -fx-background-image: url("close.png");
+}
+
+.mini-btn {
+    -fx-background-image: url("minimize.png");
+}
+
+.controlBtn {
+    -fx-background-color: #3a4750;
+    -fx-border-color: #d3d6db;
+    -fx-border-width: 0px;
+    -fx-border-style: solid;
+    -fx-text-fill: #d3d6db;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.5, 0, 4);
+}
+
+.hovered {
+    -fx-background-color: #4c5c67;
+}
+
+.back-btn {
+    -fx-background-image: url("back.png");
+}

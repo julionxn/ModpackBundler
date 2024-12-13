@@ -2,6 +2,7 @@ package me.julionxn.modpackbundler.models;
 
 import com.google.gson.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.FileVisitResult;
@@ -11,6 +12,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Profile {
@@ -20,6 +22,9 @@ public class Profile {
     private File manifestFile;
     private String version;
     private LoaderInfo loaderInfo;
+    private boolean hasImage = false;
+    private Path imagePath;
+    private String description = "";
     private final List<UUID> validUUIDs = new ArrayList<>();
 
     public Profile(String name, Path path) {
@@ -31,7 +36,7 @@ public class Profile {
         Path manifestPath = path.resolve("manifest.json");
         manifestFile = manifestPath.toFile();
         if(!manifestFile.exists()){
-            saveManifest("", new LoaderInfo(LoaderType.VANILLA, ""), new ArrayList<>());
+            saveManifest("", new LoaderInfo(LoaderType.VANILLA, ""), new ArrayList<>(), "", imagePath);
         } else {
             parseManifest();
         }
@@ -49,6 +54,14 @@ public class Profile {
         LoaderType loader = LoaderType.valueOf(loaderData.get("type").getAsString().toUpperCase());
         String version = loaderData.get("version").getAsString();
         this.loaderInfo = new LoaderInfo(loader, version);
+        JsonObject imageData = manifest.get("image").getAsJsonObject();
+        boolean has = imageData.get("has").getAsBoolean();
+        if (has) {
+            String imagePathStr = imageData.get("path").getAsString();
+            this.hasImage = true;
+            this.imagePath = Path.of(imagePathStr);
+        }
+        this.description = manifest.get("description").getAsString();
         JsonArray validUUIDs = manifest.get("validUUIDs").getAsJsonArray();
         for (JsonElement validUUID : validUUIDs) {
             String uuidStr = validUUID.getAsString();
@@ -58,10 +71,10 @@ public class Profile {
     }
 
     public void saveManifest(){
-        this.saveManifest(version, loaderInfo, validUUIDs);
+        this.saveManifest(version, loaderInfo, validUUIDs, description, imagePath);
     }
 
-    public void saveManifest(String version, LoaderInfo loaderInfo, List<UUID> validUUIDs){
+    public void saveManifest(String version, LoaderInfo loaderInfo, List<UUID> validUUIDs, String description, @Nullable Path imagePath){
         JsonObject manifest = new JsonObject();
         //Version
         manifest.addProperty("version", version);
@@ -72,6 +85,13 @@ public class Profile {
             //Version
         loader.addProperty("version", loaderInfo.version());
         manifest.add("loader", loader);
+        //Image
+        JsonObject image = new JsonObject();
+        image.addProperty("has", imagePath != null);
+        image.addProperty("path", imagePath == null ? "" : imagePath.toString());
+        manifest.add("image", image);
+        //Description
+        manifest.addProperty("description", description);
         //Valid UUIDs
         JsonArray validUUIDsArray = new JsonArray();
         for (UUID validUUID : validUUIDs) {
@@ -116,6 +136,24 @@ public class Profile {
 
     public List<UUID> getValidUUIDs() {
         return validUUIDs;
+    }
+
+    public void setImagePath(String path){
+        this.imagePath = Path.of(path);
+        this.hasImage = true;
+    }
+
+    public Optional<Path> getImagePath(){
+        if (!hasImage) return Optional.empty();
+        return Optional.of(imagePath);
+    }
+
+    public void setDescription(String description){
+        this.description = description;
+    }
+
+    public String getDescription(){
+        return description;
     }
 
     public boolean remove(){

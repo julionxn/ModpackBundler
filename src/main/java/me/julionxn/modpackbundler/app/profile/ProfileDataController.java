@@ -4,18 +4,23 @@ import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import javafx.stage.FileChooser;
+import me.julionxn.modpackbundler.BaseController;
 import me.julionxn.modpackbundler.app.ProfilesController;
 import me.julionxn.modpackbundler.models.LoaderType;
 import me.julionxn.modpackbundler.models.Profile;
 import org.jetbrains.annotations.Nullable;
 
-public class ProfileDataController {
+import java.io.File;
+
+public class ProfileDataController extends BaseController {
 
     @FXML private TextField profileName;
     @FXML private TextField version;
     @FXML private MenuButton loaderType;
     @FXML private TextField loaderVersion;
+    @FXML private TextField profileImagePath;
+    @FXML private TextField description;
     private ProfilesController controller;
     private Profile profileModified;
     private LoaderType selectedLoaderType;
@@ -52,8 +57,26 @@ public class ProfileDataController {
         }
     }
 
+    public void changeImage(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png")
+        );
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile != null) {
+            profileImagePath.setText(selectedFile.getAbsolutePath());
+        }
+    }
+
     public void done(){
-        ProfileData profileData = new ProfileData(profileName.getText(), version.getText(), selectedLoaderType, loaderVersion.getText());
+        ProfileData profileData = new ProfileData(profileName.getText(),
+                version.getText(),
+                selectedLoaderType,
+                loaderVersion.getText(),
+                profileImagePath.getText(),
+                description.getText()
+        );
         if (profileModified != null){
             controller.editProfile(profileModified, profileData);
         } else {
@@ -61,11 +84,6 @@ public class ProfileDataController {
         }
         controller.reloadProfiles();
         closeWindow();
-    }
-
-    private void closeWindow() {
-        Stage stage = (Stage) profileName.getScene().getWindow();
-        stage.close();
     }
 
 }

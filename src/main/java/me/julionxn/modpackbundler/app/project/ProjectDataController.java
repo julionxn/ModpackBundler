@@ -2,12 +2,12 @@ package me.julionxn.modpackbundler.app.project;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import me.julionxn.modpackbundler.BaseController;
 import me.julionxn.modpackbundler.app.ProjectsController;
 import me.julionxn.modpackbundler.models.Project;
 import org.jetbrains.annotations.Nullable;
 
-public class ProjectDataController {
+public class ProjectDataController extends BaseController {
 
     @FXML private TextField projectName;
     private ProjectsController projectsController;
@@ -30,11 +30,6 @@ public class ProjectDataController {
         projectsController.getSystemController().loadProjects();
         projectsController.reloadProjects();
         closeWindow();
-    }
-
-    private void closeWindow() {
-        Stage stage = (Stage) projectName.getScene().getWindow();
-        stage.close();
     }
 
 }

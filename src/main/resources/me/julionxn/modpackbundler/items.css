@@ -1,0 +1,11 @@
+#topPane {
+    -fx-background-image: url("background-top.png");
+}
+
+#controlPane {
+    -fx-background-image: url("background-control.png");
+}
+
+#canvasPane {
+    -fx-background-image: url("background-canvas.png");
+}

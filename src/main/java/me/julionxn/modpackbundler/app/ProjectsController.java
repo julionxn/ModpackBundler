@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import me.julionxn.modpackbundler.BaseController;
 import me.julionxn.modpackbundler.app.project.ProjectData;
 import me.julionxn.modpackbundler.app.project.ProjectDataController;
 import me.julionxn.modpackbundler.app.project.ProjectItem;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProjectsController {
+public class ProjectsController extends BaseController {
 
     @FXML private AnchorPane mainPane;
     @FXML private AnchorPane projectsContainer;
@@ -58,6 +59,7 @@ public class ProjectsController {
             ProjectDataController controller = loader.getController();
             controller.init(this, projectModified);
             Stage newWindow = new Stage();
+            controller.setStage(newWindow);
             newWindow.setTitle(title);
             newWindow.setScene(new Scene(newView));
             newWindow.showAndWait();
@@ -67,17 +69,17 @@ public class ProjectsController {
     }
 
     public void openProject(){
-        Stage currentStage = (Stage) mainPane.getScene().getWindow();
-        currentStage.close();
+        stage.close();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/julionxn/modpackbundler/profiles-view.fxml"));
             Parent root = loader.load();
 
             ProfilesController controller = loader.getController();
             Project project = currentProject.getProject();
-            controller.setProject(project);
+            controller.setProject(this.systemController, project);
 
             Stage stage = new Stage();
+            controller.setStage(stage);
             stage.setScene(new Scene(root));
             stage.setTitle("ModpackBundler - " + project.name);
             stage.show();
@@ -125,7 +127,11 @@ public class ProjectsController {
     }
 
     public void setCurrentProject(ProjectItem projectItem) {
+        if (currentProject != null){
+            currentProject.setActive(false);
+        }
         this.currentProject = projectItem;
+        projectItem.setActive(true);
     }
 
     public SystemController getSystemController() {

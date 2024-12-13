@@ -3,6 +3,7 @@ package me.julionxn.modpackbundler.app;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import me.julionxn.modpackbundler.BaseController;
 import me.julionxn.modpackbundler.app.profile.ProfileData;
 import me.julionxn.modpackbundler.app.profile.ProfileDataController;
 import me.julionxn.modpackbundler.app.profile.ProfileItem;
@@ -17,36 +19,42 @@ import me.julionxn.modpackbundler.models.LoaderInfo;
 import me.julionxn.modpackbundler.models.LoaderType;
 import me.julionxn.modpackbundler.models.Profile;
 import me.julionxn.modpackbundler.models.Project;
+import me.julionxn.modpackbundler.system.SystemController;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ProfilesController {
+public class ProfilesController extends BaseController {
 
     @FXML private AnchorPane profilesContainer;
     private Project project;
     private final List<ProfileItem> profileItems = new ArrayList<>();
     private ProfileItem currentProfile;
+    private SystemController systemController;
 
-    public void setProject(Project project) {
+    public void setProject(SystemController systemController, Project project) {
         this.project = project;
+        this.systemController = systemController;
         reloadProfiles();
     }
 
     public void setCurrentProfile(ProfileItem profile) {
+        if (this.currentProfile != null){
+            this.currentProfile.setActive(false);
+        }
         this.currentProfile = profile;
+        profile.setActive(true);
     }
 
     public void addProfile(){
@@ -61,6 +69,8 @@ public class ProfilesController {
         Profile profile = project.addProfile(name);
         profile.setVersion(version);
         profile.setLoaderInfo(new LoaderInfo(loaderType, loaderVersion));
+        profile.setImagePath(profileData.profileImage());
+        profile.setDescription(profileData.description());
         profile.saveManifest();
     }
 
@@ -76,6 +86,8 @@ public class ProfilesController {
         profile.rename(name);
         profile.setVersion(version);
         profile.setLoaderInfo(new LoaderInfo(loaderType, loaderVersion));
+        profile.setImagePath(profileData.profileImage());
+        profile.setDescription(profileData.description());
         profile.saveManifest();
     }
 
@@ -87,6 +99,7 @@ public class ProfilesController {
             ProfileDataController controller = loader.getController();
             controller.init(this, profileModified);
             Stage newWindow = new Stage();
+            controller.setStage(newWindow);
             newWindow.setTitle(title);
             newWindow.setScene(new Scene(newView));
             newWindow.showAndWait();
@@ -145,6 +158,26 @@ public class ProfilesController {
         }
     }
 
+    public void back(){
+        stage.close();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/julionxn/modpackbundler/projects-view.fxml"));
+            Parent root = loader.load();
+
+            ProjectsController controller = loader.getController();
+            controller.setSystemController(systemController);
+
+            Stage stage = new Stage();
+            controller.setStage(stage);
+            stage.setScene(new Scene(root));
+            stage.setTitle("ModpackBundler - " + project.name);
+            stage.show();
+
+        } catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
     public void bundle() {
         JsonObject jsonOutput = new JsonObject();
         File rootDirectory = project.path.toFile();
@@ -156,6 +189,14 @@ public class ProfilesController {
                     File manifestFile = new File(mainDir, "manifest.json");
                     if (manifestFile.exists() && manifestFile.isFile()) {
                         String relativeManifestPath = getRelativePath(manifestFile, rootDirectory);
+                        Optional<JsonObject> manifestDataOpt = openJsonAsObject(manifestFile);
+                        if (manifestDataOpt.isEmpty()) continue;
+                        JsonObject manifestData = manifestDataOpt.get();
+                        JsonObject imageData = manifestData.getAsJsonObject("image");
+                        if (imageData.get("has").getAsBoolean()){
+                            String path = imageData.get("path").getAsString();
+                            moveImageToFolder(path, mainDir);
+                        }
                         dirNode.addProperty("manifest", relativeManifestPath);
                     } else {
                         dirNode.addProperty("manifest", "not-found");
@@ -176,6 +217,28 @@ public class ProfilesController {
             throw new RuntimeException(e);
         }
         zipDirectory(rootDirectory);
+    }
+
+    private void moveImageToFolder(String sourcePath, File mainDir) {
+        try {
+            if (!mainDir.exists()) return;
+            File targetFile = new File(mainDir, "profile.png");
+            Files.move(Path.of(sourcePath), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("File moved successfully to: " + targetFile.getAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Error moving the file: " + e.getMessage());
+        }
+    }
+
+    private Optional<JsonObject> openJsonAsObject(File file) {
+        try (FileReader reader = new FileReader(file)) {
+            return Optional.ofNullable(JsonParser.parseReader(reader).getAsJsonObject());
+        } catch (IOException e) {
+            System.err.println("Error reading the JSON file: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            System.err.println("Error parsing the JSON file: " + e.getMessage());
+        }
+        return Optional.empty();
     }
 
     private void zipDirectory(File rootDirectory) {

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.julionxn.modpackbundler.app.project.ProjectDataController">
-    <AnchorPane prefHeight="32.0" prefWidth="300.0" style="-fx-background-color: #ff0000;" />
+<AnchorPane id="controlPane" stylesheets="@../styles.css" prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.julionxn.modpackbundler.app.project.ProjectDataController">
+    <AnchorPane id="topPane" fx:id="dragPane" prefHeight="32.0" prefWidth="300.0" stylesheets="@../items.css">
+        <children>
+            <Button id="topBtn" styleClass="close-btn" layoutX="275.0" layoutY="6.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#closeWindow" prefHeight="18.0" prefWidth="18.0" textAlignment="CENTER" textOverrun="CLIP">
+            </Button>
+            <Label id="title" layoutX="105.0" layoutY="8.0" text="ModpackBundler" textAlignment="CENTER" />
+        </children></AnchorPane>
    <Label alignment="CENTER" layoutX="14.0" layoutY="55.0" prefWidth="100.0" text="Project Name" />
    <TextField fx:id="projectName" layoutX="123.0" layoutY="51.0" />
-   <Button layoutX="100.0" layoutY="154.0" mnemonicParsing="false" onAction="#done" prefWidth="100.0" text="Done" />
+        <Button styleClass="controlBtn" layoutX="100.0" layoutY="154.0" mnemonicParsing="false" onAction="#done" prefWidth="100.0" text="Done" />
 </AnchorPane>
