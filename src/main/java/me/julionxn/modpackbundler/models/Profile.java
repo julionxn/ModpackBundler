@@ -23,7 +23,7 @@ public class Profile {
     private String version;
     private LoaderInfo loaderInfo;
     private boolean hasImage = false;
-    private Path imagePath;
+    private Path imagePath = null;
     private String description = "";
     private final List<UUID> validUUIDs = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public class Profile {
         Path manifestPath = path.resolve("manifest.json");
         manifestFile = manifestPath.toFile();
         if(!manifestFile.exists()){
-            saveManifest("", new LoaderInfo(LoaderType.VANILLA, ""), new ArrayList<>(), "", imagePath);
+            saveManifest("", new LoaderInfo(LoaderType.VANILLA, ""), new ArrayList<>(), "", null);
         } else {
             parseManifest();
         }
@@ -138,7 +138,8 @@ public class Profile {
         return validUUIDs;
     }
 
-    public void setImagePath(String path){
+    public void setImagePath(@Nullable String path){
+        if (path == null) return;
         this.imagePath = Path.of(path);
         this.hasImage = true;
     }

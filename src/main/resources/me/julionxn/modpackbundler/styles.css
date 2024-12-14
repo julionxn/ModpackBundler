@@ -1,12 +1,3 @@
-@font-face {
-    font-family: "Montserrat-Reg";
-    src: url("Montserrat-Regular.ttf");
-}
-
-* {
-    -fx-font-family: "Montserrat-Reg";
-}
-
 #title {
     -fx-font-size: 12px;
     -fx-text-fill: #ffffff;

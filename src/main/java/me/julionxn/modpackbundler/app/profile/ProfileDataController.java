@@ -78,7 +78,7 @@ public class ProfileDataController extends BaseController {
                 version.getText(),
                 selectedLoaderType,
                 loaderVersion.getText(),
-                profileImagePath.getText(),
+                profileImagePath.getText().isEmpty() ? null : profileImagePath.getText(),
                 description.getText()
         );
         if (profileModified != null){
