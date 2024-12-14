@@ -1,9 +1,6 @@
 package me.julionxn.modpackbundler.app;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -192,6 +189,25 @@ public class ProfilesController extends BaseController {
                         Optional<JsonObject> manifestDataOpt = openJsonAsObject(manifestFile);
                         if (manifestDataOpt.isEmpty()) continue;
                         JsonObject manifestData = manifestDataOpt.get();
+                        String folderHash;
+                        List<String> folderFiles = new ArrayList<>();
+                        try {
+                            folderHash = generateFolderHash(mainDir);
+                            try (Stream<Path> stream = Files.list(mainDir.toPath())){
+                                folderFiles = stream.map(Path::getFileName).map(Path::toString).toList();
+                            }
+                        } catch (IOException | NoSuchAlgorithmException e) {
+                            throw new RuntimeException(e);
+                        }
+                        JsonObject hashObject = new JsonObject();
+                        hashObject.addProperty("hash", folderHash);
+                        JsonArray filesArray = new JsonArray();
+                        for (String folderFile : folderFiles) {
+                            filesArray.add(folderFile);
+                        }
+                        hashObject.add("files", filesArray);
+                        manifestData.add("check", hashObject);
+                        saveJsonObject(manifestData, manifestFile);
                         JsonObject imageData = manifestData.getAsJsonObject("image");
                         if (imageData.get("has").getAsBoolean()){
                             String path = imageData.get("path").getAsString();
@@ -217,6 +233,16 @@ public class ProfilesController extends BaseController {
             throw new RuntimeException(e);
         }
         zipDirectory(rootDirectory);
+    }
+
+    private void saveJsonObject(JsonObject jsonObject, File file){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(jsonObject);
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void moveImageToFolder(String sourcePath, File mainDir) {
@@ -305,16 +331,7 @@ public class ProfilesController extends BaseController {
 
     protected String getSHA1Hash(File file) {
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-
-            try (FileInputStream fis = new FileInputStream(file)) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = fis.read(buffer)) != -1) {
-                    messageDigest.update(buffer, 0, bytesRead);
-                }
-            }
-            byte[] hashBytes = messageDigest.digest();
+            byte[] hashBytes = computeFileHashSHA1(file);
             StringBuilder hexString = new StringBuilder();
             for (byte b : hashBytes) {
                 hexString.append(String.format("%02x", b));
@@ -323,6 +340,55 @@ public class ProfilesController extends BaseController {
         } catch (IOException | NoSuchAlgorithmException e) {
             return null;
         }
+    }
+
+    public String generateFolderHash(File folder) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        updateDigestWithFolder(digest, folder, folder.getPath());
+        return bytesToHex(digest.digest());
+    }
+
+    private void updateDigestWithFolder(MessageDigest digest, File folder, String rootPath) throws IOException, NoSuchAlgorithmException {
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    updateDigestWithFolder(digest, file, rootPath);
+                } else {
+                    String relativePath = file.getPath().substring(rootPath.length());
+                    digest.update(relativePath.getBytes());
+                    digest.update(computeFileHashSHA256(file));
+                }
+            }
+        }
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+
+    private byte[] computeFileHashSHA1(File file) throws IOException, NoSuchAlgorithmException {
+        return computeFileHash(file, "SHA-1");
+    }
+
+    private byte[] computeFileHashSHA256(File file) throws IOException, NoSuchAlgorithmException {
+        return computeFileHash(file, "SHA-256");
+    }
+
+    private byte[] computeFileHash(File file, String algoritm) throws IOException, NoSuchAlgorithmException {
+        MessageDigest fileDigest = MessageDigest.getInstance(algoritm);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                fileDigest.update(buffer, 0, bytesRead);
+            }
+        }
+        return fileDigest.digest();
     }
 
     private String getRelativePath(File file, File rootDirectory) {

@@ -98,9 +98,13 @@ public class Profile {
             validUUIDsArray.add(validUUID.toString());
         }
         manifest.add("validUUIDs", validUUIDsArray);
+        saveJsonObject(manifest, manifestFile);
+    }
+
+    private void saveJsonObject(JsonObject jsonObject, File file){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(manifest);
-        try (FileWriter writer = new FileWriter(manifestFile)) {
+        String json = gson.toJson(jsonObject);
+        try (FileWriter writer = new FileWriter(file)) {
             writer.write(json);
         } catch (IOException e) {
             throw new RuntimeException(e);
