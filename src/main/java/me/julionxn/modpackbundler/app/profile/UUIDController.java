@@ -3,6 +3,7 @@ package me.julionxn.modpackbundler.app.profile;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.KeyCode;
 import me.julionxn.modpackbundler.BaseController;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +34,19 @@ public class UUIDController extends BaseController {
             }
             if (size == index + 1 && !newValue.equals(placeHolder)){
                 listView.getItems().add(placeHolder);
+            }
+        });
+        listView.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.DELETE) {
+                int index = listView.getSelectionModel().getSelectedIndex();
+                String value = listView.getItems().get(index);
+                int size = listView.getItems().size();
+                if (value != null && !value.equals(placeHolder)){
+                    listView.getItems().remove(index);
+                    if (size == index + 1){
+                        listView.getItems().add(placeHolder);
+                    }
+                }
             }
         });
     }
