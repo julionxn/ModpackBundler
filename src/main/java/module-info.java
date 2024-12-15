@@ -4,6 +4,7 @@ module me.julionxn.modpackbundler {
     requires com.google.gson;
     requires org.jetbrains.annotations;
     requires java.desktop;
+    requires java.net.http;
 
 
     opens me.julionxn.modpackbundler to javafx.fxml;

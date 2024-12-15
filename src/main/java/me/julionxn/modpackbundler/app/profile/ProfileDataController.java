@@ -1,31 +1,40 @@
 package me.julionxn.modpackbundler.app.profile;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import me.julionxn.modpackbundler.BaseController;
 import me.julionxn.modpackbundler.app.ProfilesController;
 import me.julionxn.modpackbundler.models.LoaderType;
 import me.julionxn.modpackbundler.models.Profile;
+import me.julionxn.modpackbundler.models.Project;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileDataController extends BaseController {
 
     @FXML private TextField profileName;
-    @FXML private TextField version;
+    @FXML private MenuButton version;
     @FXML private MenuButton loaderType;
-    @FXML private TextField loaderVersion;
+    @FXML private MenuButton loaderVersion;
     @FXML private TextField profileImagePath;
     @FXML private TextField description;
     private ProfilesController controller;
     private Profile profileModified;
     private LoaderType selectedLoaderType;
+    private List<String> valid;
 
-    public void init(ProfilesController controller, @Nullable Profile profileModified){
+    public void init(ProfilesController controller, @Nullable Profile profileModified, List<String> releases, List<String> fabricReleases){
         this.controller = controller;
         this.profileModified = profileModified;
         String name = profileModified != null ? profileModified.name : "";
@@ -43,6 +52,7 @@ public class ProfileDataController extends BaseController {
                 this.profileImagePath.setText(path.toString());
             });
             this.description.setText(profileModified.getDescription());
+            this.valid = profileModified.getValidUUIDs();
         } else {
             loaderType.setText(LoaderType.VANILLA.name());
             selectedLoaderType = LoaderType.VANILLA;
@@ -59,6 +69,18 @@ public class ProfileDataController extends BaseController {
             });
             loaderType.getItems().add(menuItem);
         }
+        version.getItems().clear();
+        for (String release : releases) {
+            MenuItem menuItem = new MenuItem(release);
+            menuItem.setOnAction(event -> version.setText(release));
+            version.getItems().add(menuItem);
+        }
+        loaderVersion.getItems().clear();
+        for (String release : fabricReleases) {
+            MenuItem menuItem = new MenuItem(release);
+            menuItem.setOnAction(event -> loaderVersion.setText(release));
+            loaderVersion.getItems().add(menuItem);
+        }
     }
 
     public void changeImage(){
@@ -73,13 +95,35 @@ public class ProfileDataController extends BaseController {
         }
     }
 
+    public void openUUIDs(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/julionxn/modpackbundler/uuids-view.fxml"));
+            Parent root = loader.load();
+            UUIDController controller = loader.getController();
+            controller.init(this, valid);
+            Stage stage = new Stage();
+            controller.setStage(stage);
+            stage.setScene(new Scene(root));
+            stage.setTitle("Valid UUIDs");
+            stage.show();
+        } catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setUUIDs(List<String> uuids){
+        uuids.removeIf(item -> item.equals("New UUID"));
+        valid = uuids;
+    }
+
     public void done(){
         ProfileData profileData = new ProfileData(profileName.getText(),
                 version.getText(),
                 selectedLoaderType,
-                loaderVersion.getText(),
+                selectedLoaderType == LoaderType.VANILLA ? "" : loaderVersion.getText(),
                 profileImagePath.getText().isEmpty() ? null : profileImagePath.getText(),
-                description.getText()
+                description.getText(),
+                valid == null ? new ArrayList<>() : valid
         );
         if (profileModified != null){
             controller.editProfile(profileModified, profileData);

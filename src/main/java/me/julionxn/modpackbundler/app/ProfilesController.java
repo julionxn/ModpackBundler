@@ -68,6 +68,7 @@ public class ProfilesController extends BaseController {
         profile.setLoaderInfo(new LoaderInfo(loaderType, loaderVersion));
         profile.setImagePath(profileData.profileImage());
         profile.setDescription(profileData.description());
+        profile.setUUIDs(profileData.uuids());
         profile.saveManifest();
     }
 
@@ -85,6 +86,7 @@ public class ProfilesController extends BaseController {
         profile.setLoaderInfo(new LoaderInfo(loaderType, loaderVersion));
         profile.setImagePath(profileData.profileImage());
         profile.setDescription(profileData.description());
+        profile.setUUIDs(profileData.uuids());
         profile.saveManifest();
     }
 
@@ -94,7 +96,7 @@ public class ProfilesController extends BaseController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/julionxn/modpackbundler/data-views/profile-data-view.fxml"));
             Parent newView = loader.load();
             ProfileDataController controller = loader.getController();
-            controller.init(this, profileModified);
+            controller.init(this, profileModified, systemController.getReleases(), systemController.getFabricReleases());
             Stage newWindow = new Stage();
             controller.setStage(newWindow);
             newWindow.setTitle(title);
@@ -106,7 +108,7 @@ public class ProfilesController extends BaseController {
     }
 
     public void openProfile(){
-        File folder = new File(String.valueOf(currentProfile.getProfile().path));
+        File folder = currentProfile.getProfile().path.toFile();
         if (folder.exists() && folder.isDirectory()) {
             try {
                 Desktop.getDesktop().open(folder);
@@ -233,6 +235,20 @@ public class ProfilesController extends BaseController {
             throw new RuntimeException(e);
         }
         zipDirectory(rootDirectory);
+        openProject();
+    }
+
+    private void openProject(){
+        File folder = project.path.toFile();
+        if (folder.exists() && folder.isDirectory()) {
+            try {
+                Desktop.getDesktop().open(folder);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            System.out.println("Folder does not exist or is not a directory.");
+        }
     }
 
     private void saveJsonObject(JsonObject jsonObject, File file){

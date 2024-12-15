@@ -25,7 +25,7 @@ public class Profile {
     private boolean hasImage = false;
     private Path imagePath = null;
     private String description = "";
-    private final List<UUID> validUUIDs = new ArrayList<>();
+    private final List<String> validUUIDs = new ArrayList<>();
 
     public Profile(String name, Path path) {
         this.name = name;
@@ -64,8 +64,7 @@ public class Profile {
         this.description = manifest.get("description").getAsString();
         JsonArray validUUIDs = manifest.get("validUUIDs").getAsJsonArray();
         for (JsonElement validUUID : validUUIDs) {
-            String uuidStr = validUUID.getAsString();
-            UUID uuid = UUID.fromString(uuidStr);
+            String uuid = validUUID.getAsString();
             this.validUUIDs.add(uuid);
         }
     }
@@ -74,7 +73,7 @@ public class Profile {
         this.saveManifest(version, loaderInfo, validUUIDs, description, imagePath);
     }
 
-    public void saveManifest(String version, LoaderInfo loaderInfo, List<UUID> validUUIDs, String description, @Nullable Path imagePath){
+    public void saveManifest(String version, LoaderInfo loaderInfo, List<String> validUUIDs, String description, @Nullable Path imagePath){
         JsonObject manifest = new JsonObject();
         //Version
         manifest.addProperty("version", version);
@@ -94,8 +93,8 @@ public class Profile {
         manifest.addProperty("description", description);
         //Valid UUIDs
         JsonArray validUUIDsArray = new JsonArray();
-        for (UUID validUUID : validUUIDs) {
-            validUUIDsArray.add(validUUID.toString());
+        for (String validUUID : validUUIDs) {
+            validUUIDsArray.add(validUUID);
         }
         manifest.add("validUUIDs", validUUIDsArray);
         saveJsonObject(manifest, manifestFile);
@@ -138,7 +137,12 @@ public class Profile {
         this.loaderInfo = loaderInfo;
     }
 
-    public List<UUID> getValidUUIDs() {
+    public void setUUIDs(List<String> uuid){
+        validUUIDs.clear();
+        validUUIDs.addAll(uuid);
+    }
+
+    public List<String> getValidUUIDs() {
         return validUUIDs;
     }
 

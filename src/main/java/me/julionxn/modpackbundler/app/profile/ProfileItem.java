@@ -1,6 +1,7 @@
 package me.julionxn.modpackbundler.app.profile;
 
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import me.julionxn.modpackbundler.app.BaseItem;
 import me.julionxn.modpackbundler.app.ProfilesController;
@@ -10,23 +11,19 @@ public class ProfileItem extends BaseItem {
 
     private final ProfilesController controller;
     private final Profile profile;
-    private final StackPane stackPane;
 
     public ProfileItem(ProfilesController controller, Profile profile) {
+        super(profile.name);
         this.controller = controller;
         this.profile = profile;
-        this.stackPane = getStackPane(this.profile.name);
     }
 
-    private StackPane getStackPane(String name) {
-        Label label = getLabel(name);
-        StackPane stackPane = new StackPane(rectangle, label);
-        stackPane.setOnMouseClicked(event -> {
-            controller.setCurrentProfile(this);
-        });
-        stackPane.setOnMouseEntered(event -> setHovered(true));
-        stackPane.setOnMouseExited(event -> setHovered(false));
-        return stackPane;
+    @Override
+    protected void onClick(MouseEvent event) {
+        controller.setCurrentProfile(this);
+        if (event.getClickCount() == 2){
+            controller.openProfile();
+        }
     }
 
     public StackPane getStackPane() {

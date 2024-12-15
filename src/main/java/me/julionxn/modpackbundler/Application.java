@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import me.julionxn.modpackbundler.app.ProjectsController;
+import me.julionxn.modpackbundler.app.profile.UUIDController;
 import me.julionxn.modpackbundler.system.SystemController;
 
 import java.io.IOException;

@@ -1,6 +1,7 @@
 package me.julionxn.modpackbundler.app.project;
 
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import me.julionxn.modpackbundler.app.BaseItem;
 import me.julionxn.modpackbundler.app.ProjectsController;
@@ -10,23 +11,19 @@ public class ProjectItem extends BaseItem {
 
     private final ProjectsController controller;
     private final Project project;
-    private final StackPane stackPane;
 
     public ProjectItem(ProjectsController controller, Project project) {
+        super(project.name);
         this.controller = controller;
         this.project = project;
-        this.stackPane = getStackPane(this.project.name);
     }
 
-    private StackPane getStackPane(String name) {
-        Label label = getLabel(name);
-        StackPane stackPane = new StackPane(rectangle, label);
-        stackPane.setOnMouseClicked(event -> {
-            controller.setCurrentProject(this);
-        });
-        stackPane.setOnMouseEntered(event -> setHovered(true));
-        stackPane.setOnMouseExited(event -> setHovered(false));
-        return stackPane;
+    @Override
+    protected void onClick(MouseEvent event) {
+        controller.setCurrentProject(this);
+        if (event.getClickCount() == 2){
+            controller.openProject();
+        }
     }
 
     public StackPane getStackPane() {
@@ -36,4 +33,5 @@ public class ProjectItem extends BaseItem {
     public Project getProject() {
         return project;
     }
+
 }
